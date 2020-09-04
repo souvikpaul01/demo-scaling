@@ -1,109 +1,17 @@
-'''
-##################################
-    vm1:
-      type: my.nodes.VM.OpenStack
-      properties:
-        name: nginxRadon_Host1
-        image: centos7
-        flavor: m1.xsmall
-        network: provider_64_net
-        key_name: key_khan
-
-    node1:
-      type: my.nodes.NodeExporter
-      requirements:
-        - host: vm1
-##################################
-
-'''
 #pip install ruamel.yaml
-
+import copy
 import sys
 from ruamel.yaml import YAML
 
-#input_file=open('service.yaml', 'r')
-#output_file=open('service.yaml', 'w')
-
-def dump_yaml_file(cntnt, file_name):
-    yaml_file = open(file_name, "w")
-    yaml.dump(cntnt, yaml_file)
-    yaml_file.close()
-
-def getnum():
-     
-    return num
-
-
-def update_service(num,out):
-    var = num
-    new_yaml_data_dict = {
-    'vm_'+var: {
-    	'type' : 'my.nodes.VM.OpenStack',
-        'properties': {
-        	'name': 'nginxRadon_Host_'+var,
-		'image': 'centos7',
-		'flavor': 'm2.xsmall',
-		'network': 'provider_64_net',
-		'key_name': 'key_paul'
-
-
-                    }           
-
-            },
-
-    
-     'node_'+var: {
-         'type': 'my.nodes.NodeExporter',
-         'requirements':[{
-             'host': 'vm_'+var
-        }]
-      },
-    
-    'nginx_'+var:{
-      'type': 'my.nodes.Nginx',
-      'requirements':[
-          {
-          'host': 'vm_'+var },
-          {'connectToLB': 'nginx-lb'}
-        ]
-      },
-
-
-    'site_'+var:{
-      'type': 'my.nodes.Nginx.Site',
-      'properties':{
-            'hostname': 'site_'+var
-            },
-      'requirements':[
-       
-          {'host': 'nginx_'+var}
-        ]
-      }
-      
-      
-    }
-    
-
-    for nodeName in list(cntnt["topology_template"]["node_templates"]):
-        node = cntnt["topology_template"]["node_templates"]
-        print(node)
-        node.update(new_yaml_data_dict)
-    if cntnt:
-        with open(out,'w') as yamlfile:
-            yaml.dump(cntnt, yamlfile)
 
 def find(x):
-    for nodeName in list(cntnt["topology_template"]["node_templates"]):
-        node = cntnt["topology_template"]["node_templates"]
-   # print(node)
-
-    for i in node:
-        u = i.split('_')
-     #  print(u[0])
+    nodes = cntnt["topology_template"]["node_templates"]
+    for node in nodes:
+        u = node.split('_')
         if u[0] == x :
-           # print("found")
             break
-    return u[0], i
+   # print(u[0],node)
+    return u[0], node
 
 def change(c):
     name, name_i = find(c)
@@ -114,51 +22,81 @@ def change(c):
 
         return r
 
+def run(c):
+#    print(nodesToChange, c)
+    if c:
+        next_node = check_host(c)
+        nodesToChange[c]= ''
+
+   # print(nodesToChange, next_node)
+        if next_node not in nodesToChange:
+           run(next_node)
+        findNodesToChange(c)
+
+#       with open('exp.yaml','w') as yamlfile:
+#          yaml.dump(cntnt, yamlfile)
+
+
+def findNodesToChange(c):
+      for node in cntnt["topology_template"]["node_templates"]:
+        i = check_host(node)
+        if i == c:
+          if node not in nodesToChange:
+            run(node)
+
+#	    print(node,i)
+#            if node not in nodesToChange.keys():
+#                print("Need to deploy ", node)
+                #update_dy(node)
 
 def update_dy(v):
-    node_to_change =str(change(v))
-    print(node_to_change)
-    cntnt["topology_template"]["node_templates"][node_to_change]=cntnt["topology_template"]["node_templates"]['node_xx']
-    with open('exp.yaml','w') as yamlfile:
-        yaml.dump(cntnt, yamlfile)
+    node_to_change = v.replace("xx","09")      #str(change(v))
+    original_node = v 
+    #node_to_change_next = check_host(original_node)
+   # print(node_to_change_next)
+    cntnt["topology_template"]["node_templates"][node_to_change] = copy.deepcopy( cntnt["topology_template"]["node_templates"][original_node])
+    #del cntnt["topology_template"]["node_templates"][original_node]
+    if 'requirements' in cntnt["topology_template"]["node_templates"][node_to_change].keys():   
+        for i in cntnt["topology_template"]["node_templates"][node_to_change]['requirements']:
+     #       print(i.keys())
+            if 'host' in i.keys():
+                i['host'] = i['host'].replace("xx",'09')
 
-
-
-
-def check():
-    node = cntnt["topology_template"]["node_templates"]
-    for d in node.values():
-        if 'requirements' in d.keys():
-            for requirement in d['requirements']:
-                if 'host' in requirement.keys():
-                    print(requirement['host'])
-
-
-
-
-
-
+#        with open('exp.yaml','w') as yamlfile:
+#            yaml.dump(cntnt, yamlfile)
+    #original_node = original_node.replace("_xx",'')
+    #print(original_node)
+#        node_to_change_next = check_host(original_node)
+#        return update_dy(node_to_change_next)
     
+
+def check_host(k):
+    node = k 
+    nodes = cntnt["topology_template"]["node_templates"][node] 
+    if 'requirements' in nodes.keys():
+        for requirement in nodes['requirements']:
+            if 'host' in requirement.keys():
+                host_i = requirement['host']
+                return host_i
+
+
+
 if __name__ == "__main__":
-#   print("python upscale.py <input_file> <output_file>")
     input_file  =  open(sys.argv[1],'r')
-    req = sys.argv[2]
-   #out = sys.argv[2]
+    req = sys.argv[2] + '_xx'
     yaml = YAML(typ='safe')
     yaml.default_flow_style = False
     yaml.sort_base_mapping_type_on_output = False
-    #yaml.sort_keys = False
     cntnt =  yaml.load(input_file)
-    #print(cntnt)
-    #num = get_num()
-    #update_service('7',out)
-    # put the vm number here
-    
-  #  to_find = find(x)
-#    print(to_find)
-    #print(change(req))
-#    update_dy(req)
-    check()
+
+    nodesToChange = {}
+    run(req) 
+    for scalable_nodes in nodesToChange:
+        update_dy(scalable_nodes)
+    with open('exp.yaml','w') as yamlfile:
+        yaml.dump(cntnt, yamlfile)
+
     input_file.close()
 
 
+   
