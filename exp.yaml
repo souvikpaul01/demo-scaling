@@ -265,3 +265,7 @@ topology_template:
       - host: vm_xx
       - connectToLB: nginx-lb
       type: my.nodes.Nginx
+    node_09:
+      type: my.nodes.NodeExporter
+      requirements:
+      - host: vm_09

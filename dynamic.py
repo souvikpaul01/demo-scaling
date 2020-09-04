@@ -23,17 +23,31 @@ def change(c):
         return r
 
 def run(c):
+#    print(nodesToChange, c)
     if c:
-        update_dy(c)
         next_node = check_host(c)
         nodesToChange[c]= ''
-        return run(next_node)
-    else:
-        for i in nodesToChange.keys():
-            print(i)
 
-        with open('exp.yaml','w') as yamlfile:
-            yaml.dump(cntnt, yamlfile)
+   # print(nodesToChange, next_node)
+        if next_node not in nodesToChange:
+           run(next_node)
+        findNodesToChange(c)
+
+#       with open('exp.yaml','w') as yamlfile:
+#          yaml.dump(cntnt, yamlfile)
+
+
+def findNodesToChange(c):
+      for node in cntnt["topology_template"]["node_templates"]:
+        i = check_host(node)
+        if i == c:
+          if node not in nodesToChange:
+            run(node)
+
+#	    print(node,i)
+#            if node not in nodesToChange.keys():
+#                print("Need to deploy ", node)
+                #update_dy(node)
 
 def update_dy(v):
     node_to_change = v.replace("xx","09")      #str(change(v))
@@ -76,10 +90,13 @@ if __name__ == "__main__":
     cntnt =  yaml.load(input_file)
 
     nodesToChange = {}
-    #findNodesToChange()
-    
-    run(req)
-    #check_host(req)
+    run(req) 
+    for scalable_nodes in nodesToChange:
+        update_dy(scalable_nodes)
+    with open('exp.yaml','w') as yamlfile:
+        yaml.dump(cntnt, yamlfile)
+
     input_file.close()
 
 
+   
