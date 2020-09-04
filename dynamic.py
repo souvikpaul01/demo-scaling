@@ -1,37 +1,8 @@
-'''
-##################################
-    vm1:
-      type: my.nodes.VM.OpenStack
-      properties:
-        name: nginxRadon_Host1
-        image: centos7
-        flavor: m1.xsmall
-        network: provider_64_net
-        key_name: key_khan
-
-    node1:
-      type: my.nodes.NodeExporter
-      requirements:
-        - host: vm1
-##################################
-
-'''
 #pip install ruamel.yaml
 
 import sys
 from ruamel.yaml import YAML
 
-#input_file=open('service.yaml', 'r')
-#output_file=open('service.yaml', 'w')
-
-def dump_yaml_file(cntnt, file_name):
-    yaml_file = open(file_name, "w")
-    yaml.dump(cntnt, yaml_file)
-    yaml_file.close()
-
-def getnum():
-     
-    return num
 
 
 def update_service(num,out):
@@ -94,16 +65,12 @@ def update_service(num,out):
 
 def find(x):
     for nodeName in list(cntnt["topology_template"]["node_templates"]):
-        node = cntnt["topology_template"]["node_templates"]
-   # print(node)
-
-    for i in node:
-        u = i.split('_')
-     #  print(u[0])
+        nodes = cntnt["topology_template"]["node_templates"]
+    for node in nodes:
+        u = node.split('_')
         if u[0] == x :
-           # print("found")
             break
-    return u[0], i
+    return u[0], node
 
 def change(c):
     name, name_i = find(c)
@@ -116,49 +83,46 @@ def change(c):
 
 
 def update_dy(v):
-    node_to_change =str(change(v))
-    print(node_to_change)
+    node_to_change = str(change(v))
+    
+    node_to_change_next = check_host(v)
+    print(node_to_change_next)
     cntnt["topology_template"]["node_templates"][node_to_change]=cntnt["topology_template"]["node_templates"]['node_xx']
     with open('exp.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
-
-
-
-
-def check():
-    node = cntnt["topology_template"]["node_templates"]
-    for d in node.values():
-        if 'requirements' in d.keys():
-            for requirement in d['requirements']:
-                if 'host' in requirement.keys():
-                    print(requirement['host'])
-
-
-
-
-
-
     
+    return update_dy(node_to_change_next)
+
+
+#############################################################
+
+def check_host():
+    nodes = cntnt["topology_template"]["node_templates"]
+    print(nodes.values())
+    for node in nodes.values():
+        print(node)
+        if 'requirements' in node.keys():
+            for requirement in node['requirements']:
+                if 'host' in requirement.keys():
+                    host = requirement['host']
+                 #   print(host)
+                    return host
+#############################################################
+
+
+
+
+
 if __name__ == "__main__":
-#   print("python upscale.py <input_file> <output_file>")
     input_file  =  open(sys.argv[1],'r')
     req = sys.argv[2]
-   #out = sys.argv[2]
     yaml = YAML(typ='safe')
     yaml.default_flow_style = False
     yaml.sort_base_mapping_type_on_output = False
-    #yaml.sort_keys = False
     cntnt =  yaml.load(input_file)
-    #print(cntnt)
-    #num = get_num()
-    #update_service('7',out)
-    # put the vm number here
     
-  #  to_find = find(x)
-#    print(to_find)
-    #print(change(req))
-#    update_dy(req)
-    check()
+    check_host()
+
     input_file.close()
 
 

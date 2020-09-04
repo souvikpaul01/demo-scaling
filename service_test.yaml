@@ -230,11 +230,11 @@ topology_template:
     node_xx:
       type: my.nodes.NodeExporter
       requirements:
-      - host: vm1_xx
+      - host: vm_xx
     nginx_xx:
       type: my.nodes.Nginx
       requirements:
-      - host: vm1_xx
+      - host: vm_xx
       - connectToLB: nginx-lb
     site_xx:
       type: my.nodes.Nginx.Site
