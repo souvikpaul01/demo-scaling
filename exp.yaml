@@ -1,0 +1,254 @@
+node_types:
+  my.nodes.Nginx.loadBalancer:
+    attributes:
+      remote_host_ip:
+        type: string
+        description: Location of nginx site configs
+      site_config_dir:
+        type: string
+        description: Location of nginx site configs
+    interfaces:
+      Standard:
+        operations:
+          create:
+            implementation:
+              primary: playbooks/lb/install.yml
+          configure:
+            implementation:
+              primary: playbooks/lb/configure.yml
+          delete:
+            implementation:
+              primary: playbooks/lb/uninstall.yml
+        type: tosca.interfaces.node.lifecycle.Standard
+    capabilities:
+      connectToLB:
+        type: tosca.capabilities.Endpoint
+        valid_source_types:
+        - my.nodes.Nginx
+    derived_from: tosca.nodes.SoftwareComponent
+  my.nodes.Nginx:
+    attributes:
+      remote_host_ip:
+        type: string
+        description: Location of nginx site configs
+      site_config_dir:
+        type: string
+        description: Location of nginx site configs
+    interfaces:
+      Standard:
+        operations:
+          create:
+            implementation:
+              primary: playbooks/nginx/install.yml
+          delete:
+            implementation:
+              primary: playbooks/nginx/uninstall.yml
+        type: tosca.interfaces.node.lifecycle.Standard
+    requirements:
+    - connectToLB:
+        capability: tosca.capabilities.Endpoint
+        node: my.nodes.Nginx.loadBalancer
+        relationship: radon.relationships.LB_WebApp
+    capabilities:
+      host:
+        type: tosca.capabilities.Compute
+        valid_source_types:
+        - my.nodes.Nginx.Site
+    derived_from: tosca.nodes.SoftwareComponent
+  my.nodes.NodeExporter:
+    interfaces:
+      Standard:
+        operations:
+          create: playbooks/node_exporter/node_exporter.yml
+        type: tosca.interfaces.node.lifecycle.Standard
+    requirements:
+    - host:
+        capability: tosca.capabilities.Compute
+        relationship: tosca.relationships.HostedOn
+    derived_from: tosca.nodes.SoftwareComponent
+  my.nodes.Nginx.Site:
+    interfaces:
+      Standard:
+        operations:
+          create:
+            implementation: playbooks/site/create.yml
+            inputs:
+              hostname:
+                default:
+                  get_property:
+                  - SELF
+                  - hostname
+          delete: playbooks/site/delete.yml
+        type: tosca.interfaces.node.lifecycle.Standard
+    requirements:
+    - host:
+        capability: tosca.capabilities.Compute
+        relationship: my.relationships.NginxSiteHosting
+    properties:
+      hostname:
+        type: string
+        description: IP of the remote database
+    derived_from: tosca.nodes.SoftwareComponent
+  my.nodes.VM.OpenStack:
+    attributes:
+      id:
+        type: string
+        description: OpenStack id of the VM
+    interfaces:
+      Standard:
+        operations:
+          create:
+            implementation: playbooks/vm/create.yml
+            inputs:
+              vm_name:
+                default:
+                  get_property:
+                  - SELF
+                  - name
+              key_name:
+                default:
+                  get_property:
+                  - SELF
+                  - key_name
+              image:
+                default:
+                  get_property:
+                  - SELF
+                  - image
+              flavor:
+                default:
+                  get_property:
+                  - SELF
+                  - flavor
+              network:
+                default:
+                  get_property:
+                  - SELF
+                  - network
+          delete:
+            implementation: playbooks/vm/delete.yml
+            inputs:
+              id:
+                default:
+                  get_attribute:
+                  - SELF
+                  - id
+        type: tosca.interfaces.node.lifecycle.Standard
+    properties:
+      key_name:
+        type: string
+        description: OpenStack SSH key name that should be placed on the VM
+      image:
+        type: string
+        description: OpenStack image id (image names are not accepted)
+      name:
+        type: string
+        description: Name that should be given to the VM in OpenStack
+      flavor:
+        type: string
+        description: OpenStack flavor id (flavor names are not accepted)
+      network:
+        type: string
+        description: OpenStack network id (network names are not accepted)
+    derived_from: tosca.nodes.Compute
+tosca_definitions_version: tosca_simple_yaml_1_3
+relationship_types:
+  radon.relationships.LB_WebApp:
+    interfaces:
+      Configure:
+        operations:
+          post_configure_target:
+            implementation:
+              primary: playbooks/nginx/add_webApp.yml
+            inputs:
+              WebApp_end_points_IP:
+                default:
+                  get_attribute:
+                  - SOURCE
+                  - host
+                  - public_address
+    description: Allow the new web App to be connected to a existing load balancer.
+    derived_from: tosca.relationships.ConnectsTo
+  my.relationships.NginxSiteHosting:
+    interfaces:
+      Standard:
+        operations:
+          post_configure_source:
+            implementation:
+              primary: playbooks/nginx/reload.yml
+        type: tosca.interfaces.node.lifecycle.Standard
+    derived_from: tosca.relationships.HostedOn
+policy_types:
+  radon.policies.scaling.ScaleIn:
+    properties:
+      cpu_upper_bound:
+        required: false
+        type: float
+        description: The upper bound for the CPU
+        constraints:
+        - less_or_equal: 20.0
+      adjustment:
+        required: false
+        type: integer
+        description: The amount by which to scale
+        constraints:
+        - less_or_equal: -1
+    derived_from: tosca.policies.Scaling
+  radon.policies.scaling.ScaleOut:
+    properties:
+      cpu_upper_bound:
+        required: false
+        type: float
+        description: The upper bound for the CPU
+        constraints:
+        - greater_or_equal: 80.0
+      adjustment:
+        required: false
+        type: integer
+        description: The amount by which to scale
+        constraints:
+        - greater_or_equal: 1
+    derived_from: tosca.policies.Scaling
+topology_template:
+  node_templates:
+    site_xx:
+      requirements:
+      - host: nginx_xx
+      type: my.nodes.Nginx.Site
+      properties:
+        hostname: site1
+    vm_xx:
+      type: my.nodes.VM.OpenStack
+      properties:
+        key_name: key_paul
+        image: centos7
+        name: nginxRadon_Host_1
+        flavor: m2.xsmall
+        network: provider_64_net
+    nginx-lb:
+      requirements:
+      - host: vm_loadBalancer
+      type: my.nodes.Nginx.loadBalancer
+    site_09:
+      type: my.nodes.Nginx.Site
+      requirements:
+      - host: nginx_09
+      properties:
+        hostname: site1
+    vm_loadBalancer:
+      type: my.nodes.VM.OpenStack
+      properties:
+        key_name: key_paul
+        image: centos7
+        name: nginxRadon_loadBalancer_0
+        flavor: m2.xsmall
+        network: provider_64_net
+    node_xx:
+      requirements:
+      - host: vm_xx
+      type: my.nodes.NodeExporter
+    nginx_xx:
+      requirements:
+      - host: vm_xx
+      - connectToLB: nginx-lb
+      type: my.nodes.Nginx
