@@ -10,31 +10,23 @@ def find(x):
         u = node.split('_')
         if u[0] == x :
             break
-   # print(u[0],node)
     return u[0], node
 
 def change(c):
     name, name_i = find(c)
-  #  print(name, name_i)
     if name == c and name_i[-2:] == 'xx' :
-   #     print("okay",name_i)
         r = name_i.replace("xx","09")
 
         return r
 
 def run(c):
-#    print(nodesToChange, c)
     if c:
         next_node = check_host(c)
         nodesToChange[c]= ''
 
-   # print(nodesToChange, next_node)
         if next_node not in nodesToChange:
            run(next_node)
         findNodesToChange(c)
-
-#       with open('exp.yaml','w') as yamlfile:
-#          yaml.dump(cntnt, yamlfile)
 
 
 def findNodesToChange(c):
@@ -44,31 +36,16 @@ def findNodesToChange(c):
           if node not in nodesToChange:
             run(node)
 
-#	    print(node,i)
-#            if node not in nodesToChange.keys():
-#                print("Need to deploy ", node)
-                #update_dy(node)
 
 def update_dy(v):
-    node_to_change = v.replace("xx","09")      #str(change(v))
+    node_to_change = v.replace("xx","09")
     original_node = v 
-    #node_to_change_next = check_host(original_node)
-   # print(node_to_change_next)
     cntnt["topology_template"]["node_templates"][node_to_change] = copy.deepcopy( cntnt["topology_template"]["node_templates"][original_node])
-    #del cntnt["topology_template"]["node_templates"][original_node]
     if 'requirements' in cntnt["topology_template"]["node_templates"][node_to_change].keys():   
         for i in cntnt["topology_template"]["node_templates"][node_to_change]['requirements']:
-     #       print(i.keys())
             if 'host' in i.keys():
                 i['host'] = i['host'].replace("xx",'09')
 
-#        with open('exp.yaml','w') as yamlfile:
-#            yaml.dump(cntnt, yamlfile)
-    #original_node = original_node.replace("_xx",'')
-    #print(original_node)
-#        node_to_change_next = check_host(original_node)
-#        return update_dy(node_to_change_next)
-    
 
 def check_host(k):
     node = k 
@@ -93,10 +70,10 @@ if __name__ == "__main__":
     run(req) 
     for scalable_nodes in nodesToChange:
         update_dy(scalable_nodes)
+# Save the num to a json file. and get the data from there
     with open('exp.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
 
     input_file.close()
 
 
-   
