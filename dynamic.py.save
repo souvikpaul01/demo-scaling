@@ -3,10 +3,8 @@ import copy
 import sys
 from ruamel.yaml import YAML
 import os
-import json
 
-'''
-Not in use For Current Scenerio
+
 def find(x):
     nodes = cntnt["topology_template"]["node_templates"]
     for node in nodes:
@@ -21,8 +19,6 @@ def change(c):
         r = name_i.replace("xx","09")
 
         return r
-'''
-
 
 def run(c):
     if c:
@@ -43,14 +39,13 @@ def findNodesToChange(c):
 
 
 def update_dy(v,var):
-    var = str(var)
     node_to_change = v.replace("xx",var)
     original_node = v 
     cntnt["topology_template"]["node_templates"][node_to_change] = copy.deepcopy( cntnt["topology_template"]["node_templates"][original_node])
     if 'requirements' in cntnt["topology_template"]["node_templates"][node_to_change].keys():   
         for i in cntnt["topology_template"]["node_templates"][node_to_change]['requirements']:
             if 'host' in i.keys():
-                i['host'] = i['host'].replace("xx",var)
+                i['host'] = i['host'].replace("xx",'09')
 
 
 def check_host(k):
@@ -72,35 +67,36 @@ if __name__ == "__main__":
     yaml.default_flow_style = False
     yaml.sort_base_mapping_type_on_output = False
     cntnt =  yaml.load(input_file)
+    data = {}
     # Check the latest number of scalable instance and get  the num from the json file
-    data_file = open('data.json','r')
+    types = ["vm","node","nginx","site"]
+   # var = 
+    data = open('data.json','r+')
     if os.stat("data.json").st_size == 0:
-        node_to_write = {
-		'scale_index':0
-		}
-        with open('data.json','w') as write_file:
-            json.dump(node_to_write,write_file)
-    else:
-	data =  json.load(data_file)
-        var = data['scale_index']+1
-#	print(var) 
-#    data_file.close()
+#       data['instances'] = []
+	node = {}
+	for node_type in types:
+	    node['id'] = '01'
+	    node['name'] = node_type
+	    data['instances'] = node
+	with open('data.json','w') as write_file:
+	    json(dump,write_file)
+
+
 
     nodesToChange = {}
-    run(req)
-#    print(nodesToChange)
-    for scalable_nodes in nodesToChange.keys():
-  #     print(scalable_nodes)
- #      print(var)
-       update_dy(scalable_nodes,var)
+   # run(req,var)
+   # for scalable_nodes in nodesToChange:
+    #    update_dy(scalable_nodes,var)
 
-    #Save the num to a json file.
-    data['scale_index'] = var
-    with open('data.json','w') as write_file:
-        json.dump(data,write_file)
-    
+
+
+
+    # Save the num to a json file. and get the data from there
     with open('exp.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
+
+
 
     input_file.close()
 
