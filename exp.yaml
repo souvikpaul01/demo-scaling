@@ -211,14 +211,6 @@ policy_types:
     derived_from: tosca.policies.Scaling
 topology_template:
   node_templates:
-    vm_09:
-      type: my.nodes.VM.OpenStack
-      properties:
-        key_name: key_paul
-        image: centos7
-        name: nginxRadon_Host_1
-        flavor: m2.xsmall
-        network: provider_64_net
     site_xx:
       requirements:
       - host: nginx_xx
@@ -237,12 +229,6 @@ topology_template:
       requirements:
       - host: vm_loadBalancer
       type: my.nodes.Nginx.loadBalancer
-    site_09:
-      type: my.nodes.Nginx.Site
-      requirements:
-      - host: nginx_09
-      properties:
-        hostname: site1
     vm_loadBalancer:
       type: my.nodes.VM.OpenStack
       properties:
@@ -255,17 +241,8 @@ topology_template:
       requirements:
       - host: vm_xx
       type: my.nodes.NodeExporter
-    nginx_09:
-      type: my.nodes.Nginx
-      requirements:
-      - host: vm_09
-      - connectToLB: nginx-lb
     nginx_xx:
       requirements:
       - host: vm_xx
       - connectToLB: nginx-lb
       type: my.nodes.Nginx
-    node_09:
-      type: my.nodes.NodeExporter
-      requirements:
-      - host: vm_09
