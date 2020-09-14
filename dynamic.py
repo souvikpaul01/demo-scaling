@@ -51,10 +51,13 @@ def update_dy(v,var):
         for i in cntnt["topology_template"]["node_templates"][node_to_change]['requirements']:
             if 'host' in i.keys():
                 i['host'] = i['host'].replace("xx",var)
+    if 'properties' in cntnt["topology_template"]["node_templates"][node_to_change].keys():
+        if 'name' in cntnt["topology_template"]["node_templates"][node_to_change]['properties'].keys():
+            cntnt["topology_template"]["node_templates"][node_to_change]['properties']['name']=cntnt["topology_template"]["node_templates"][node_to_change]['properties']['name'].replace("xx",var)
 
 
 def check_host(k):
-    node = k 
+    node = k
     nodes = cntnt["topology_template"]["node_templates"][node] 
     if 'requirements' in nodes.keys():
         for requirement in nodes['requirements']:
@@ -76,12 +79,12 @@ if __name__ == "__main__":
     data_file = open('data.json','r')
     if os.stat("data.json").st_size == 0:
         node_to_write = {
-		'scale_index':0
+		'scale_index':1
 		}
         with open('data.json','w') as write_file:
             json.dump(node_to_write,write_file)
     else:
-	data =  json.load(data_file)
+        data =json.load(data_file)
         var = data['scale_index']+1
 #	print(var) 
 #    data_file.close()
@@ -98,8 +101,8 @@ if __name__ == "__main__":
     data['scale_index'] = var
     with open('data.json','w') as write_file:
         json.dump(data,write_file)
-    
-    with open('exp.yaml','w') as yamlfile:
+
+    with open('service_test_gen.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
 
     input_file.close()

@@ -1,0 +1,14 @@
+{
+  "tosca_name": {
+    "is_set": true,
+    "data": "nginx-lb-host-vm_loadBalancer"
+  },
+  "tosca_id": {
+    "is_set": true,
+    "data": "nginx-lb_0--vm_loadBalancer_0"
+  },
+  "state": {
+    "is_set": true,
+    "data": "initial"
+  }
+}
