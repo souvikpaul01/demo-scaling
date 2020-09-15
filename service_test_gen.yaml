@@ -246,4 +246,26 @@ topology_template:
       type: my.nodes.Nginx.loadBalancer
       requirements:
       - host: vm_loadBalancer
-    
+    site_10:
+      type: my.nodes.Nginx.Site
+      properties:
+        hostname: site1
+      requirements:
+      - host: nginx_10
+    nginx_10:
+      type: my.nodes.Nginx
+      requirements:
+      - host: vm_10
+      - connectToLB: nginx-lb
+    vm_10:
+      type: my.nodes.VM.OpenStack
+      properties:
+        name: nginxRadon_Host_10
+        image: centos7
+        flavor: m2.xsmall
+        network: provider_64_net
+        key_name: key_paul
+    node_10:
+      type: my.nodes.NodeExporter
+      requirements:
+      - host: vm_10
