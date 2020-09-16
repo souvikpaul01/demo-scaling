@@ -1,0 +1,14 @@
+{
+  "tosca_name": {
+    "is_set": true,
+    "data": "node_xx-host-vm_xx"
+  },
+  "tosca_id": {
+    "is_set": true,
+    "data": "node_xx_0--vm_xx_0"
+  },
+  "state": {
+    "is_set": true,
+    "data": "initial"
+  }
+}

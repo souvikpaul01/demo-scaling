@@ -1,0 +1,30 @@
+{
+  "tosca_name": {
+    "is_set": true,
+    "data": "nginx-lb"
+  },
+  "tosca_id": {
+    "is_set": true,
+    "data": "nginx-lb_0"
+  },
+  "state": {
+    "is_set": true,
+    "data": "started"
+  },
+  "component_version": {
+    "is_set": false,
+    "data": null
+  },
+  "admin_credential": {
+    "is_set": false,
+    "data": null
+  },
+  "site_config_dir": {
+    "is_set": true,
+    "data": "/etc/nginx/conf.d"
+  },
+  "remote_host_ip": {
+    "is_set": false,
+    "data": null
+  }
+}
