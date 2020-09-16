@@ -211,6 +211,29 @@ policy_types:
         - greater_or_equal: 1
 topology_template:
   node_templates:
+    site_12:
+      type: my.nodes.Nginx.Site
+      properties:
+        hostname: site1
+      requirements:
+      - host: nginx_12
+    nginx_12:
+      type: my.nodes.Nginx
+      requirements:
+      - host: vm_12
+      - connectToLB: nginx-lb
+    vm_12:
+      type: my.nodes.VM.OpenStack
+      properties:
+        name: nginxRadon_Host_12
+        image: centos7
+        flavor: m2.xsmall
+        network: provider_64_net
+        key_name: key_paul
+    node_12:
+      type: my.nodes.NodeExporter
+      requirements:
+      - host: vm_12
     vm_loadBalancer:
       type: my.nodes.VM.OpenStack
       properties:
@@ -246,26 +269,3 @@ topology_template:
       type: my.nodes.Nginx.loadBalancer
       requirements:
       - host: vm_loadBalancer
-    site_12:
-      type: my.nodes.Nginx.Site
-      properties:
-        hostname: site1
-      requirements:
-      - host: nginx_12
-    nginx_12:
-      type: my.nodes.Nginx
-      requirements:
-      - host: vm_12
-      - connectToLB: nginx-lb
-    vm_12:
-      type: my.nodes.VM.OpenStack
-      properties:
-        name: nginxRadon_Host_12
-        image: centos7
-        flavor: m2.xsmall
-        network: provider_64_net
-        key_name: key_paul
-    node_12:
-      type: my.nodes.NodeExporter
-      requirements:
-      - host: vm_12

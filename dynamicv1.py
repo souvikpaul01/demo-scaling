@@ -4,7 +4,6 @@ import sys
 from ruamel.yaml import YAML
 import os
 import json
-from pathlib import Path
 from ruamel.yaml.comments import CommentedMap
 from ruamel.yaml.compat import ordereddict
 from collections import OrderedDict
@@ -44,30 +43,6 @@ def findNodesToChange(c):
           if node not in nodesToChange:
             run(node)
 
-def update_dy2(v,var):
-    var = str(var)
-    node_to_change = v.replace("xx",var)
-    original_node = v
-
-
-    newNode = copy.deepcopy(cntnt["topology_template"]["node_templates"][original_node])
-
-    if 'requirements' in newNode.keys():
-        for i in newNode['requirements']:
-            if 'host' in i.keys():
-                i['host'] = i['host'].replace("xx",var)
-    if 'properties' in newNode.keys():
-        if 'name' in newNode['properties'].keys():
-            newNode['properties']['name']=newNode['properties']['name'].replace("xx",var)
-
-#    cntnt["topology_template"]["node_templates"][node_to_change] = newNode
-#    print(newNode)
-    return node_to_change, newNode
-
-   # print(cntnt["topology_template"]["node_templates"])
-   # print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-
-
 
 def update_dy(v,var):
     var = str(var)
@@ -83,12 +58,6 @@ def update_dy(v,var):
             cntnt["topology_template"]["node_templates"][node_to_change]['properties']['name']=cntnt["topology_template"]["node_templates"][node_to_change]['properties']['name'].replace("xx",var)
     print(cntnt["topology_template"]["node_templates"])
     print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^")
-
-
-
-
-
-
 def check_host(k):
     node = k
     nodes = cntnt["topology_template"]["node_templates"][node] 
@@ -111,13 +80,8 @@ if __name__ == "__main__":
     file = cntnt
 
     # Check the latest number of scalable instance and get  the num from the json file
-    
-    my_file = Path("data.json")
-    if my_file.is_file():
-        data_file = open('data.json','r+')
-        data =json.load(data_file)
-        var = data['scale_index']+1
-    else:
+    data_file = open('data.json','w')
+    if os.stat("data.json").st_size == 0:
         node_to_write = {
 		'scale_index':0
 		}
@@ -126,26 +90,33 @@ if __name__ == "__main__":
         data = node_to_write
         var = data['scale_index'] + 1
 
+    else:
+        data =json.load(data_file)
+        var = data['scale_index']+1
 
-    list_node = []
-    list_prop = []
     nodesToChange = {}
     run(req)
-    dict_res = {}
-
     for scalable_nodes in nodesToChange.keys():
-        newNode, newNode_properties = update_dy2(scalable_nodes,var)
-        list_prop.append(newNode_properties)
-        list_node.append(newNode)
-    dict_res = dict(zip(list_node,list_prop))
+       update_dy(scalable_nodes,var)
+
+    tmp = cntnt["topology_template"]["node_templates"]['nginx-lb']
+    del cntnt["topology_template"]["node_templates"]['nginx-lb']
+    cntnt["topology_template"]["node_templates"]['nginx-lb']=tmp
+
+    '''
 
     tmp = cntnt["topology_template"]["node_templates"]
+    del cntnt["topology_template"]["node_templates"]
     cntnt["topology_template"]["node_templates"] = {}
-    dict_res.update(tmp)
-    cntnt["topology_template"]["node_templates"].update(dict_res)
+    update
+
+    for a in tmp:
+        cntnt["topology_template"]["node_templates"].add(a)
+
+    '''
+
 
     #Save the num to a json file.
-
     data['scale_index'] = var
     with open('data.json','w') as write_file:
         json.dump(data,write_file)
@@ -154,6 +125,5 @@ if __name__ == "__main__":
         yaml.dump(cntnt, yamlfile)
 
     input_file.close()
-
 
 
