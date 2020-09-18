@@ -102,16 +102,15 @@ def check_host(k):
 
 if __name__ == "__main__":
     input_file  =  open(sys.argv[1],'r')
+#    print(inputfile)
     req = sys.argv[2] + '_xx'
 
     yaml = YAML(typ='safe')
     yaml.default_flow_style = False
     yaml.sort_base_mapping_type_on_output = False
     cntnt = yaml.load(input_file)
-    file = cntnt
-
+#    checkpoint = 
     # Check the latest number of scalable instance and get  the num from the json file
-    
     my_file = Path("data.json")
     if my_file.is_file():
         data_file = open('data.json','r+')
@@ -140,6 +139,7 @@ if __name__ == "__main__":
     dict_res = dict(zip(list_node,list_prop))
 
     tmp = cntnt["topology_template"]["node_templates"]
+
     cntnt["topology_template"]["node_templates"] = {}
     dict_res.update(tmp)
     cntnt["topology_template"]["node_templates"].update(dict_res)
@@ -148,8 +148,7 @@ if __name__ == "__main__":
 
     data['scale_index'] = var
     with open('data.json','w') as write_file:
-        json.dump(data,write_file)
-
+        json.dump(data,write_file) 
     with open('service_test_gen.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
 

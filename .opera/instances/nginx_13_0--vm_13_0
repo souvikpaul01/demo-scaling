@@ -1,0 +1,14 @@
+{
+  "tosca_name": {
+    "is_set": true,
+    "data": "nginx_13-host-vm_13"
+  },
+  "tosca_id": {
+    "is_set": true,
+    "data": "nginx_13_0--vm_13_0"
+  },
+  "state": {
+    "is_set": true,
+    "data": "initial"
+  }
+}
