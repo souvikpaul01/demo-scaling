@@ -37,7 +37,7 @@
   },
   "public_address": {
     "is_set": true,
-    "data": "172.17.66.49"
+    "data": "172.17.67.61"
   },
   "networks": {
     "is_set": false,
@@ -49,6 +49,6 @@
   },
   "id": {
     "is_set": true,
-    "data": "e59d679d-6414-4b70-9c30-ac45054d66e7"
+    "data": "4672b7db-ee26-4677-ac18-43d93332c510"
   }
 }
