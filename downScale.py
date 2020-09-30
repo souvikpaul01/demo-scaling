@@ -101,17 +101,87 @@ def check_host(k):
 
 
 if __name__ == "__main__":
+
+#Normal things with Yaml 
+    yaml = YAML(typ='safe')
+    yaml.default_flow_style = False
+    yaml.sort_base_mapping_type_on_output = False
+
+
+
+
+#Get the scale index from data.json
+    my_file = Path("data.json")
+
+    if my_file.is_file():
+        data_file = open('data.json','r+')
+        data =json.load(data_file)
+        if data['scale_index'] == 0:
+            print("Nothing to downscale")
+        else:
+            var = data['scale_index']
+    else:
+        node_to_write = {
+                'scale_index':0
+                }
+        with open('data.json','w') as write_file:
+            json.dump(node_to_write,write_file)
+        data = node_to_write
+        var = data['scale_index']
+
+#Remove the block of nodes_var from the template topology
+#do this as early as possible. high priority
+
+   toUndeployFile = open("checkPoint_" +str(var) + '.yaml','r')
+
     input_file  =  open(sys.argv[1],'r')
+    cntnt = yaml.load(input_file)
+
+
+    undeployList = []
+    toUndeploy = yaml.load(toUndeployFile)
+    for keys in  toUndeploy["topology_template"]["node_templates"].keys():
+        undeployList.append(keys)
+
+    for items in undeployList:
+        if  items in cntnt["topology_template"]["node_templates"].keys():
+            cntnt["topology_template"]["node_templates"].pop(items, None)
+
+    with open('service_test_gen.yaml','w') as yamlfile:
+        yaml.dump(cntnt, yamlfile)
+
+
+
+#Change the .opera/root_file context to checkpoint_var
+    path = '/.opera/'
+    with open()
+
+#Remove the '\n' from the /.opera/root_file
+
+
+'''
+#remove references/relationships to missing node types
+
+
+#Remove the ngnix_lb file from .opera/instances
+
+
+#Perform undeploy on the rootfile
+
+
+#Decrement the scale indx in data.json file# Read in the file
+
+
+    input_file  =  open(sys.argv[1],'r')
+
     req = sys.argv[2] + '_xx'
 
     yaml = YAML(typ='safe')
     yaml.default_flow_style = False
     yaml.sort_base_mapping_type_on_output = False
     cntnt = yaml.load(input_file)
-    checkpoint = cntnt
-
-
-# Check the latest number of scalable instance and get  the num from the json file
+#    checkpoint = 
+    # Check the latest number of scalable instance and get  the num from the json file
     my_file = Path("data.json")
     if my_file.is_file():
         data_file = open('data.json','r+')
@@ -138,20 +208,10 @@ if __name__ == "__main__":
         list_prop.append(newNode_properties)
         list_node.append(newNode)
     dict_res = dict(zip(list_node,list_prop))
-  #  print(dict_res)
+
     tmp = cntnt["topology_template"]["node_templates"]
 
-
     cntnt["topology_template"]["node_templates"] = {}
-    checkpoint["topology_template"]["node_templates"] = {}
-
-
-    checkpoint["topology_template"]["node_templates"].update(dict_res)
-    with open('checkPoint_'+str(var) +'.yaml','w') as yamlfile:
-        yaml.dump(checkpoint, yamlfile)
-
-
-
     dict_res.update(tmp)
     cntnt["topology_template"]["node_templates"].update(dict_res)
 
@@ -160,7 +220,6 @@ if __name__ == "__main__":
     data['scale_index'] = var
     with open('data.json','w') as write_file:
         json.dump(data,write_file) 
-
     with open('service_test_gen.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
 
@@ -168,3 +227,4 @@ if __name__ == "__main__":
 
 
 
+'''

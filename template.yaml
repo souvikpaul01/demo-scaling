@@ -246,3 +246,4 @@ topology_template:
       type: my.nodes.Nginx.loadBalancer
       requirements:
       - host: vm_loadBalancer
+    
