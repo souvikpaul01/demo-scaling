@@ -221,7 +221,6 @@ topology_template:
       type: my.nodes.Nginx
       requirements:
       - host: vm_1
-      - connectToLB: nginx-lb
     vm_1:
       type: my.nodes.VM.OpenStack
       properties:

@@ -8,6 +8,8 @@ from pathlib import Path
 from ruamel.yaml.comments import CommentedMap
 from ruamel.yaml.compat import ordereddict
 from collections import OrderedDict
+import fileinput
+
 '''
 Not in use For Current Scenerio
 def find(x):
@@ -132,7 +134,7 @@ if __name__ == "__main__":
 #Remove the block of nodes_var from the template topology
 #do this as early as possible. high priority
 
-   toUndeployFile = open("checkPoint_" +str(var) + '.yaml','r')
+    toUndeployFile = open("checkPoint_" +str(var) + '.yaml','r')
 
     input_file  =  open(sys.argv[1],'r')
     cntnt = yaml.load(input_file)
@@ -150,27 +152,52 @@ if __name__ == "__main__":
     with open('service_test_gen.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
 
-
-
 #Change the .opera/root_file context to checkpoint_var
-    path = '/.opera/'
-    with open()
+#And Remove the '\n' from the /.opera/root_file
 
-#Remove the '\n' from the /.opera/root_file
+    path = os.getcwd()
+    with open(path +'/.opera/root_file','r') as file:
+        filedata = file.read()
+
+    replacement_text = "checkPoint_" +str(var) + ".yaml"
+
+    filedata = filedata.replace(filedata, replacement_text)
+    filedata.rstrip()
+
+    with open(path +'/.opera/root_file', 'w') as file:
+        file.write(filedata)
 
 
-'''
 #remove references/relationships to missing node types
+    toUndeployNodes = toUndeploy["topology_template"]["node_templates"]
+    for nodes in toUndeployNodes.values():
+        if 'requirements' in  nodes.keys():
+            for requirement in nodes['requirements']:
+                reqHosts = list(requirement.values())
+                for reqHost in reqHosts:
+                    if reqHost not in undeployList:
+                        keyToDelete = list(requirement.keys())
+                        nodes['requirements'].remove(requirement)
+
+    with open("checkPoint_" +str(var) + ".yaml",'w') as yamlfile:
+        yaml.dump(toUndeploy, yamlfile)
 
 
 #Remove the ngnix_lb file from .opera/instances
+#this can be done in the base folder 
 
 
 #Perform undeploy on the rootfile
+#this can also be done  n
 
 
-#Decrement the scale indx in data.json file# Read in the file
+#Decrement the scale indx in data.json file
 
+
+
+
+
+'''
 
     input_file  =  open(sys.argv[1],'r')
 
