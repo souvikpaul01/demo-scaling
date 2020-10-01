@@ -1,19 +1,19 @@
 {
   "tosca_name": {
     "is_set": true,
-    "data": "vm_13"
+    "data": "vm_1"
   },
   "tosca_id": {
     "is_set": true,
-    "data": "vm_13_0"
+    "data": "vm_1_0"
   },
   "state": {
     "is_set": true,
-    "data": "started"
+    "data": "initial"
   },
   "name": {
     "is_set": true,
-    "data": "nginxRadon_Host_13"
+    "data": "nginxRadon_Host_1"
   },
   "image": {
     "is_set": true,
@@ -32,12 +32,12 @@
     "data": "key_paul"
   },
   "private_address": {
-    "is_set": true,
-    "data": ""
+    "is_set": false,
+    "data": null
   },
   "public_address": {
-    "is_set": true,
-    "data": "172.17.66.252"
+    "is_set": false,
+    "data": null
   },
   "networks": {
     "is_set": false,
@@ -48,7 +48,7 @@
     "data": null
   },
   "id": {
-    "is_set": true,
-    "data": "535af564-65c4-44f6-b601-32d40e6c3f9e"
+    "is_set": false,
+    "data": null
   }
 }

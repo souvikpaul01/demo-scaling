@@ -1,15 +1,15 @@
 {
   "tosca_name": {
     "is_set": true,
-    "data": "site_13"
+    "data": "site_1"
   },
   "tosca_id": {
     "is_set": true,
-    "data": "site_13_0"
+    "data": "site_1_0"
   },
   "state": {
     "is_set": true,
-    "data": "started"
+    "data": "initial"
   },
   "component_version": {
     "is_set": false,
