@@ -19,8 +19,6 @@ def webhook_api_prometheus():
         print ("json file received ")
         my_date = json.dumps(request.json)
        # print (my_date)
-        
-        
         dict_info = json.loads(my_date)
         for i in dict_info['alerts']:
             alert =i['labels']['alertname']
@@ -31,24 +29,19 @@ def webhook_api_prometheus():
 
                 out = subprocess.Popen("ps -Alf | grep 'python scaleup.py' | wc | tr -s  \ | cut -f2 -d' '",stdout = subprocess.PIPE,shell =True)
                 (numpro,err) = out.communicate()
-                
+
                 print(int(numpro))
                 if int(numpro) <= 2 :
                     print('Scaling in Progress...')
                     os.system('python scaleup.py')
                 else:
                    print("XOpera already running..Try again Later")
-            
             elif(alert == 'LowCpuLoad'):
                 print('Time to Scale Down')
             elif(alert == 'InstanceDown'):
                 print('Restart Instance/Node exporter')
             else:
                 print('some other thing')
-        
-        
-        
-        
         #subprocess.Popen(["bash", "/home/atiq/testScript.sh"]) 
                                   #Here you have to provide your script path and script name
         return (my_date)

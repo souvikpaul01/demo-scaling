@@ -152,6 +152,11 @@ if __name__ == "__main__":
     with open('service_test_gen.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
 
+
+
+#REdeploy  the  main service file
+
+
 #Change the .opera/root_file context to checkpoint_var
 #And Remove the '\n' from the /.opera/root_file
 
