@@ -74,11 +74,6 @@
         url: https://releases.hashicorp.com/consul/1.8.5/consul_1.8.5_linux_amd64.zip
         dest: /opt/consul
 
-    - name: Install unzip
-      package: 
-        name: unzip
-        state: installed
-
     - name: unarchive consul
       unarchive:  
         remote_src: yes    
@@ -101,23 +96,22 @@
         remote_src: yes   
         path: /usr/bin/consul 
         state: link   
-        src: /opt/consul/consul
+        src: /opt/consul/consul_1.8.5_linux_386/consul
 
     - name: install unit file to systemd for consul
       template:  
         remote_src: no 
-        src: /home/ubuntu/opera/xopera-opera/examples/nginx_openstack/webApp-loadbalancer-node_exporter-TOSCA/demo-scaling/playbooks/node_exporter/consul.service      
+        src: /home/ubuntu/opera/xopera-opera/examples/nginx_openstack/webApp-loadbalancer-node_exporter-TOSCA/playbook/node_exporter/consul.service      
         dest: /etc/systemd/system/consul.service  
  
-    - name: configure systemd to use service 
-      systemd:  
-        daemon_reload: yes  
+    - name: configure systemd to use service systemd:  
+      daemon_reload: yes  
         enabled: yes  
         state: started 
         name: consul.service      
 
     - name: Join the agents
-      shell : consul join 172.17.66.41
-      
+      shell: |
+        sudo consul join 172.17.64.224
 
 

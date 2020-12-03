@@ -18,7 +18,6 @@ def webhook_api_prometheus():
     if request.headers['Content-Type'] == 'application/json':
         print ("json file received ")
         my_date = json.dumps(request.json)
-       # print (my_date)
         dict_info = json.loads(my_date)
         for i in dict_info['alerts']:
             alert =i['labels']['alertname']
@@ -27,36 +26,38 @@ def webhook_api_prometheus():
             if(alert == 'HighCpuLoad'):
                 print("Request for Scaling...")
 
-                out = subprocess.Popen("ps -Alf | grep 'python scaleup.py' | wc | tr -s  \ | cut -f2 -d' '",stdout = subprocess.PIPE,shell =True)
+                out = subprocess.Popen("ps -Alf | grep 'python autoscale.py' | wc | tr -s  \ | cut -f2 -d' '",stdout = subprocess.PIPE,shell =True)
                 (numpro,err) = out.communicate()
 
-                print(int(numpro))
+                #print(int(numpro))
                 if int(numpro) <= 2 :
                     print('Scaling in Progress...')
-                    os.system('python scaleup.py')
+                    os.system('python autoscaleup.py 1')
                 else:
                    print("XOpera already running..Try again Later")
             elif(alert == 'LowCpuLoad'):
+
                 print('Time to Scale Down')
+                out = subprocess.Popen("ps -Alf | grep 'python autoscale.py' | wc | tr -s  \ | cut -f2 -d' '",stdout = subprocess.PIPE,shell =True)
+                (numpro,err) = out.communicate()
+
+                #print(int(numpro))
+                if int(numpro) <= 2 :
+                    print('Scaling in Progress...')
+                    os.system('python autoscaleup.py -1')
+                else:
+                   print("XOpera already running..Try again Later")
+
             elif(alert == 'InstanceDown'):
                 print('Restart Instance/Node exporter')
             else:
                 print('some other thing')
-        #subprocess.Popen(["bash", "/home/atiq/testScript.sh"]) 
-                                  #Here you have to provide your script path and script name
         return (my_date)
     else:
         return("Connected Anyway")
 
 
 
-#@app.route('/github', methods=['POST'])
-#def api_github_message():
-#    if request.headers['Content-Type'] == 'application/json':
-#        print ("Great, you got the json data")
-#        my_info = json.dumps(request.json)
-#        print (my_info)
-#        return (my_info)
 
 
 if __name__ == "__main__":

@@ -161,7 +161,7 @@ if __name__ == "__main__":
     with open('data.json','w') as write_file:
         json.dump(data,write_file) 
 
-    with open('service_test_gen.yaml','w') as yamlfile:
+    with open('service.yaml','w') as yamlfile:
         yaml.dump(cntnt, yamlfile)
 
     input_file.close()
